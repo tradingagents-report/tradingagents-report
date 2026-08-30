@@ -18,7 +18,6 @@ This project is an Apache 2.0 derivative of [Tauric Research / TradingAgents](ht
 | TradingView Data API | Exchange-level symbols, daily bars, indicators, fundamentals, news, calendars, peers, multi-timeframe TA |
 | Structured decisions | Analyst-section signals, `decision_brief`, in-window price/fundamental chart snapshots |
 | Multi-market tickers | Deterministic parsing for `600519.SS`, `HKEX:700`, `NASDAQ:AAPL` |
-| Optional China vendors | AKShare / Tushare / BaoStock / PandaAI (`pip install ".[china-data]"`) |
 | Cache | In-process TTL by default; optional Redis to reuse requests across processes |
 
 Upstream multi-agent debate, multi-LLM providers, checkpoints, and the five-level rating stay in place.
@@ -42,7 +41,7 @@ pip install .
 Optional extras:
 
 ```bash
-pip install ".[china-data]"   # China-market adapters
+pip install ".[finnhub]"      # Finnhub
 pip install ".[bedrock]"      # Amazon Bedrock
 ```
 

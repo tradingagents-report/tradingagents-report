@@ -13,19 +13,6 @@ from typing import Any
 
 import pandas as pd
 
-from .akshare.fundamentals import (
-    get_akshare_fundamentals,
-    get_akshare_identity,
-    get_balance_sheet as get_akshare_balance_sheet,
-    get_cashflow as get_akshare_cashflow,
-    get_income_statement as get_akshare_income_statement,
-)
-from .akshare.market import (
-    fetch_akshare_ohlcv,
-    get_akshare_indicators,
-    get_akshare_stock,
-)
-from .akshare.news import get_akshare_news
 from .alpha_vantage import (
     get_balance_sheet as get_alpha_vantage_balance_sheet,
     get_cashflow as get_alpha_vantage_cashflow,
@@ -38,15 +25,6 @@ from .alpha_vantage import (
     get_stock as get_alpha_vantage_stock,
 )
 from .alpha_vantage.stock import fetch_alpha_vantage_ohlcv
-from .baostock.fundamentals import (
-    get_baostock_fundamentals,
-    get_baostock_identity,
-)
-from .baostock.market import (
-    fetch_baostock_ohlcv,
-    get_baostock_indicators,
-    get_baostock_stock,
-)
 from .config import get_config
 from .errors import (
     NoMarketDataError,
@@ -62,7 +40,6 @@ from .finnhub import (
 )
 from .fred import get_macro_data as get_fred_macro_data
 from .market_routing import configured_market_chain
-from .pandaai.market import fetch_pandaai_ohlcv, get_pandaai_stock
 from .polymarket import get_prediction_markets as get_polymarket_prediction_markets
 from .provider_models import ProviderResult
 from .tradingview.calendar import (
@@ -87,19 +64,6 @@ from .tradingview.ta import (
     get_tradingview_ta_indicators,
     get_tradingview_ta_summary,
 )
-from .tushare.fundamentals import (
-    get_balance_sheet as get_tushare_balance_sheet,
-    get_cashflow as get_tushare_cashflow,
-    get_income_statement as get_tushare_income_statement,
-    get_tushare_fundamentals,
-    get_tushare_identity,
-)
-from .tushare.market import (
-    fetch_tushare_ohlcv,
-    get_tushare_indicators,
-    get_tushare_stock,
-)
-from .tushare.news import get_tushare_global_news, get_tushare_news
 from .yfinance.market import (
     fetch_yfinance_ohlcv,
     get_balance_sheet as get_yfinance_balance_sheet,
@@ -185,19 +149,6 @@ TOOLS_CATEGORIES = {
     }
 }
 
-VENDOR_LIST = [
-    "tradingview",
-    "yfinance",
-    "fred",
-    "polymarket",
-    "alpha_vantage",
-    "pandaai",
-    "akshare",
-    "tushare",
-    "baostock",
-    "finnhub",
-]
-
 # Optional extras supply macro or event context for news analysis, not core
 # decision inputs. Vendor failures degrade to a readable sentinel. Price,
 # fundamentals, and news stay hard failures so analysis cannot continue silently
@@ -218,9 +169,6 @@ VENDOR_METHODS = {
     "get_instrument_identity": {
         "tradingview": get_tradingview_identity,
         "yfinance": get_yfinance_identity,
-        "akshare": get_akshare_identity,
-        "tushare": get_tushare_identity,
-        "baostock": get_baostock_identity,
         "finnhub": get_finnhub_identity,
     },
     # Core prices: get_stock_data is history for text reports; get_ohlcv returns
@@ -229,28 +177,17 @@ VENDOR_METHODS = {
         "tradingview": get_tradingview_stock,
         "yfinance": get_YFin_data_online,
         "alpha_vantage": get_alpha_vantage_stock,
-        "pandaai": get_pandaai_stock,
-        "akshare": get_akshare_stock,
-        "tushare": get_tushare_stock,
-        "baostock": get_baostock_stock,
     },
     "get_ohlcv": {
         "tradingview": fetch_tradingview_ohlcv,
         "yfinance": fetch_yfinance_ohlcv,
         "alpha_vantage": fetch_alpha_vantage_ohlcv,
-        "pandaai": fetch_pandaai_ohlcv,
-        "akshare": fetch_akshare_ohlcv,
-        "tushare": fetch_tushare_ohlcv,
-        "baostock": fetch_baostock_ohlcv,
     },
     # Indicators: SMA, RSI, MACD, and similar from ticker, as-of date, and lookback.
     "get_indicators": {
         "tradingview": get_tradingview_indicators,
         "yfinance": get_stock_stats_indicators_window,
         "alpha_vantage": get_alpha_vantage_indicator,
-        "akshare": get_akshare_indicators,
-        "tushare": get_tushare_indicators,
-        "baostock": get_baostock_indicators,
     },
     # Multi-timeframe TA dashboard: TradingView Buy/Sell/Neutral plus snapshots.
     # Optional category; degrades when the vendor is unavailable.
@@ -265,46 +202,34 @@ VENDOR_METHODS = {
         "tradingview": get_tradingview_fundamentals,
         "yfinance": get_yfinance_fundamentals,
         "alpha_vantage": get_alpha_vantage_fundamentals,
-        "akshare": get_akshare_fundamentals,
-        "tushare": get_tushare_fundamentals,
-        "baostock": get_baostock_fundamentals,
         "finnhub": get_finnhub_fundamentals,
     },
     "get_balance_sheet": {
         "tradingview": get_tradingview_balance_sheet,
         "yfinance": get_yfinance_balance_sheet,
         "alpha_vantage": get_alpha_vantage_balance_sheet,
-        "akshare": get_akshare_balance_sheet,
-        "tushare": get_tushare_balance_sheet,
     },
     "get_cashflow": {
         "tradingview": get_tradingview_cashflow,
         "yfinance": get_yfinance_cashflow,
         "alpha_vantage": get_alpha_vantage_cashflow,
-        "akshare": get_akshare_cashflow,
-        "tushare": get_tushare_cashflow,
     },
     "get_income_statement": {
         "tradingview": get_tradingview_income_statement,
         "yfinance": get_yfinance_income_statement,
         "alpha_vantage": get_alpha_vantage_income_statement,
-        "akshare": get_akshare_income_statement,
-        "tushare": get_tushare_income_statement,
     },
     # News and insider data. All three respect the historical as-of boundary.
     "get_news": {
         "tradingview": get_tradingview_news,
         "yfinance": get_news_yfinance,
         "alpha_vantage": get_alpha_vantage_news,
-        "akshare": get_akshare_news,
-        "tushare": get_tushare_news,
         "finnhub": get_finnhub_news,
     },
     "get_global_news": {
         "tradingview": get_tradingview_global_news,
         "yfinance": get_global_news_yfinance,
         "alpha_vantage": get_alpha_vantage_global_news,
-        "tushare": get_tushare_global_news,
         "finnhub": get_finnhub_global_news,
     },
     "get_insider_transactions": {
@@ -363,18 +288,6 @@ def get_category_for_method(method: str) -> str:
             return category
     raise ValueError(f"Method '{method}' not found in any category")
 
-def get_vendor(category: str, method: str = None) -> str:
-    """Read vendor config. Tool-level ``tool_vendors`` wins over category config."""
-    config = get_config()
-
-    # A single tool can override the category default, e.g. news vs prices.
-    if method:
-        tool_vendors = config.get("tool_vendors", {})
-        if method in tool_vendors:
-            return tool_vendors[method]
-
-    # No tool override: fall back to category-level ``data_vendors``.
-    return config.get("data_vendors", {}).get(category, "default")
 
 def _vendor_chain(method: str, category: str, args: tuple[Any, ...] = ()) -> list[str]:
     """Build the vendor chain for one call. Only registered explicit config is used."""

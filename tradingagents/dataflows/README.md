@@ -14,16 +14,16 @@ chain. Unconfigured tools use `DEFAULT_VENDOR_CHAINS`.
 
 ### Market-aware vendor chains
 
-`TRADINGAGENTS_CN_DATA_VENDORS` and `TRADINGAGENTS_US_DATA_VENDORS` enable
-ordered CN/US chains. Unset, empty, or `disabled` preserves the immutable
-method defaults. Routing precedence is tool override, category override,
-market chain, then method default. A selected market chain is intersected with
-`VENDOR_METHODS[method]` and never falls through to an unlisted provider.
+`TRADINGAGENTS_US_DATA_VENDORS` enables an ordered US chain. Unset, empty, or
+`disabled` preserves the immutable method defaults. Routing precedence is tool
+override, category override, market chain, then method default. A selected
+market chain is intersected with `VENDOR_METHODS[method]` and never falls
+through to an unlisted provider. Non-US listings (including A-shares such as
+`600519.SS`) ignore the US chain and keep the TradingView-first defaults.
 
-The CN adapters are PandaAI, AKShare, Tushare, and BaoStock. The US chain may
-use PandaAI, TradingView, yfinance, Alpha Vantage, and Finnhub. SDK imports are
-lazy, and no adapter fabricates missing data. Provider credentials remain in
-environment variables and are not part of API request overrides.
+The US chain may use TradingView, yfinance, Alpha Vantage, and Finnhub. SDK
+imports are lazy, and no adapter fabricates missing data. Provider credentials
+remain in environment variables and are not part of API request overrides.
 
 See [data-source configuration, capability matrix, authentication, and licensing](../../docs/DATA_SOURCE_CONFIGURATION.md).
 

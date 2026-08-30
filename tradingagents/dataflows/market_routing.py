@@ -7,9 +7,8 @@ from typing import Any
 
 from .listings import ListingRef, country_for_exchange, resolve_listing
 
-CN_VENDORS = frozenset({"pandaai", "akshare", "tushare", "baostock"})
-US_VENDORS = frozenset({"pandaai", "tradingview", "yfinance", "alpha_vantage", "finnhub"})
-MARKET_VENDORS = {"CN": CN_VENDORS, "US": US_VENDORS}
+US_VENDORS = frozenset({"tradingview", "yfinance", "alpha_vantage", "finnhub"})
+MARKET_VENDORS = {"US": US_VENDORS}
 
 
 def parse_market_vendor_chain(
@@ -19,7 +18,7 @@ def parse_market_vendor_chain(
     """Parse one exact, ordered market chain or return ``None`` when disabled."""
     normalized_market = str(market).strip().upper()
     if normalized_market not in MARKET_VENDORS:
-        raise ValueError(f"unsupported market {market!r}; expected CN or US")
+        raise ValueError(f"unsupported market {market!r}; expected US")
     value = str(raw or "").strip().lower()
     if not value or value == "disabled":
         return None
@@ -38,7 +37,7 @@ def parse_market_vendor_chain(
 
 
 def market_for_listing(listing: ListingRef) -> str | None:
-    """Return CN/US for a normalized listing without guessing numeric tickers."""
+    """Return US for a normalized listing without guessing numeric tickers."""
     country = country_for_exchange(listing.exchange)
     if country in MARKET_VENDORS:
         return country

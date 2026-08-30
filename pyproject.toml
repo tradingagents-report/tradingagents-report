@@ -50,22 +50,10 @@ dev = [
 bedrock = [
     "langchain-aws>=1.5.0",
 ]
-china-data = [
-    "akshare>=1.17.86",
-    "tushare>=1.4.21",
-    "baostock>=0.8.8",
-]
-pandaai = [
-    "panda_data>=0.0.1",
-]
 finnhub = [
     "finnhub-python>=2.4.23",
 ]
 market-data = [
-    "akshare>=1.17.86",
-    "tushare>=1.4.21",
-    "baostock>=0.8.8",
-    "panda_data>=0.0.1",
     "finnhub-python>=2.4.23",
 ]
 

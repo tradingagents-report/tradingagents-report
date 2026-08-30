@@ -22,7 +22,6 @@ _ENV_OVERRIDES = {
     "TRADINGAGENTS_REDDIT_ENABLED":        "reddit_enabled",
     "TRADINGAGENTS_REDDIT_RETRY_ON_429":   "reddit_retry_on_429",
     "TRADINGAGENTS_REDDIT_429_COOLDOWN_SECONDS": "reddit_429_cooldown_seconds",
-    "TRADINGAGENTS_CN_DATA_VENDORS":       "cn_data_vendors",
     "TRADINGAGENTS_US_DATA_VENDORS":       "us_data_vendors",
     # Provider-specific reasoning/thinking knobs (None = each provider's own
     # default). Settable here for non-interactive runs; the CLI also offers an
@@ -67,10 +66,10 @@ def _apply_env_overrides(config: dict) -> dict:
         if raw is None or raw == "":
             continue
         try:
-            if key in {"cn_data_vendors", "us_data_vendors"}:
+            if key == "us_data_vendors":
                 from .dataflows.market_routing import parse_market_vendor_chain
 
-                config[key] = parse_market_vendor_chain(raw, key[:2])
+                config[key] = parse_market_vendor_chain(raw, "US")
             else:
                 config[key] = _coerce(raw, config.get(key))
         except ValueError as exc:
@@ -129,11 +128,9 @@ DEFAULT_CONFIG = _apply_env_overrides({
     "reddit_enabled": True,
     "reddit_retry_on_429": False,
     "reddit_429_cooldown_seconds": 900.0,
-    # Optional market-aware vendor priority for newly registered adapters
-    # (PandaAI / AKShare / Tushare / BaoStock / Finnhub). Keep None / disabled
-    # for now so runtime continues to use the explicit data_vendors chains
-    # below (TradingView-first). Do not enable until product rollout.
-    "cn_data_vendors": None,
+    # Optional US market-aware vendor priority for newly registered adapters
+    # (Finnhub). Keep None / disabled so runtime continues to use the explicit
+    # data_vendors chains below (TradingView-first).
     "us_data_vendors": None,
     # Search queries used by get_global_news for macro headlines. Extend or
     # replace to broaden geographic / sector coverage.

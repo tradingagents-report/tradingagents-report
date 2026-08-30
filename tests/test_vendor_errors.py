@@ -126,7 +126,7 @@ class RouterHandlesBaseTypesTests(unittest.TestCase):
         self.assertIn("[REDACTED]", logs)
         self.assertNotIn("supersecret", logs)
 
-    def test_safe_error_redacts_pandaai_credentials(self):
+    def test_safe_error_redacts_username_password_authorization(self):
         secrets = {
             "username": "alice@example.com",
             "password": "correct-horse",

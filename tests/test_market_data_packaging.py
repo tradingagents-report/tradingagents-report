@@ -11,13 +11,10 @@ def test_market_data_sdks_are_optional_extras():
     )["project"]
     required = set(project["dependencies"])
     extras = project["optional-dependencies"]
-
-    china = {"akshare>=1.17.86", "tushare>=1.4.21", "baostock>=0.8.8"}
-    pandaai = {"panda_data>=0.0.1"}
     finnhub = {"finnhub-python>=2.4.23"}
 
-    assert set(extras["china-data"]) == china
-    assert set(extras["pandaai"]) == pandaai
+    assert "china-data" not in extras
+    assert "pandaai" not in extras
     assert set(extras["finnhub"]) == finnhub
-    assert set(extras["market-data"]) == china | pandaai | finnhub
-    assert not (china | pandaai | finnhub) & required
+    assert set(extras["market-data"]) == finnhub
+    assert not finnhub & required

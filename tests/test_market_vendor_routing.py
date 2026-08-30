@@ -8,11 +8,10 @@ from tradingagents.dataflows.listings import resolve_listing
 def test_parse_market_vendor_chain_preserves_priority():
     from tradingagents.dataflows.market_routing import parse_market_vendor_chain
 
-    assert parse_market_vendor_chain("pandaai,akshare,tushare,baostock", "CN") == (
-        "pandaai",
-        "akshare",
-        "tushare",
-        "baostock",
+    assert parse_market_vendor_chain("yfinance,alpha_vantage,finnhub", "US") == (
+        "yfinance",
+        "alpha_vantage",
+        "finnhub",
     )
 
 
@@ -26,10 +25,11 @@ def test_parse_market_vendor_chain_can_be_disabled(raw):
 @pytest.mark.parametrize(
     "raw,market",
     [
-        ("akshare,akshare", "CN"),
-        ("disabled,akshare", "CN"),
-        ("finnhub", "CN"),
+        ("finnhub,finnhub", "US"),
+        ("disabled,finnhub", "US"),
+        ("akshare", "US"),
         ("bogus", "US"),
+        ("finnhub", "CN"),
     ],
 )
 def test_parse_market_vendor_chain_rejects_invalid_values(raw, market):
@@ -42,8 +42,8 @@ def test_parse_market_vendor_chain_rejects_invalid_values(raw, market):
 @pytest.mark.parametrize(
     "ticker,market",
     [
-        ("600519.SS", "CN"),
-        ("SZSE:000001", "CN"),
+        ("600519.SS", None),
+        ("SZSE:000001", None),
         ("NASDAQ:AAPL", "US"),
         ("AAPL", "US"),
         ("600519", None),
@@ -59,8 +59,7 @@ def test_configured_market_chain_uses_resolved_market():
     from tradingagents.dataflows.market_routing import configured_market_chain
 
     config = {
-        "cn_data_vendors": ("akshare", "tushare"),
         "us_data_vendors": ("yfinance", "finnhub"),
     }
-    assert configured_market_chain(config, "600519.SS") == ("akshare", "tushare")
+    assert configured_market_chain(config, "600519.SS") is None
     assert configured_market_chain(config, "AAPL") == ("yfinance", "finnhub")

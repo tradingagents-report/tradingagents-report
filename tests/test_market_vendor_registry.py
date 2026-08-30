@@ -8,37 +8,6 @@ import tradingagents.dataflows.interface as interface
 from tradingagents.dataflows.config import set_config
 
 EXPECTED = {
-    "pandaai": {"get_stock_data", "get_ohlcv"},
-    "akshare": {
-        "get_instrument_identity",
-        "get_stock_data",
-        "get_ohlcv",
-        "get_indicators",
-        "get_fundamentals",
-        "get_balance_sheet",
-        "get_cashflow",
-        "get_income_statement",
-        "get_news",
-    },
-    "tushare": {
-        "get_instrument_identity",
-        "get_stock_data",
-        "get_ohlcv",
-        "get_indicators",
-        "get_fundamentals",
-        "get_balance_sheet",
-        "get_cashflow",
-        "get_income_statement",
-        "get_news",
-        "get_global_news",
-    },
-    "baostock": {
-        "get_instrument_identity",
-        "get_stock_data",
-        "get_ohlcv",
-        "get_indicators",
-        "get_fundamentals",
-    },
     "finnhub": {
         "get_instrument_identity",
         "get_fundamentals",
@@ -57,70 +26,68 @@ def test_declared_vendor_capabilities_are_registered(vendor, methods):
     assert registered == methods
 
 
-def test_cn_market_chain_filters_unsupported_vendor_and_preserves_order():
+def test_us_market_chain_filters_unsupported_vendor_and_preserves_order():
     set_config(
         {
-            "cn_data_vendors": ("pandaai", "akshare", "tushare"),
+            "us_data_vendors": ("yfinance", "finnhub"),
             "data_vendors": {"news_data": "default"},
             "tool_vendors": {},
         }
     )
-    panda = mock.Mock(side_effect=AssertionError("PandaAI has no news capability"))
-    akshare = mock.Mock(return_value="AK NEWS")
-    tushare = mock.Mock(return_value="TS NEWS")
+    yfinance = mock.Mock(side_effect=AssertionError("yfinance is not registered here"))
+    finnhub = mock.Mock(return_value="FH NEWS")
     with mock.patch.dict(
         interface.VENDOR_METHODS,
-        {"get_news": {"akshare": akshare, "tushare": tushare}},
+        {"get_news": {"finnhub": finnhub}},
         clear=False,
     ):
-        result = interface.route_to_vendor("get_news", "600519.SS", "2026-01-01", "2026-01-15")
-    assert result == "AK NEWS"
-    panda.assert_not_called()
-    akshare.assert_called_once()
-    tushare.assert_not_called()
+        result = interface.route_to_vendor("get_news", "AAPL", "2026-01-01", "2026-01-15")
+    assert result == "FH NEWS"
+    yfinance.assert_not_called()
+    finnhub.assert_called_once()
 
 
 def test_explicit_category_chain_overrides_market_chain():
     set_config(
         {
-            "cn_data_vendors": ("akshare", "tushare"),
+            "us_data_vendors": ("finnhub",),
             "data_vendors": {"core_stock_apis": "yfinance"},
         }
     )
-    akshare = mock.Mock(side_effect=AssertionError("outside explicit chain"))
+    finnhub = mock.Mock(side_effect=AssertionError("outside explicit chain"))
     with mock.patch.dict(
         interface.VENDOR_METHODS,
-        {"get_stock_data": {"yfinance": lambda *args: "YF", "akshare": akshare}},
+        {"get_stock_data": {"yfinance": lambda *args: "YF", "finnhub": finnhub}},
         clear=False,
     ):
         result = interface.route_to_vendor(
-            "get_stock_data", "600519.SS", "2026-01-01", "2026-01-15"
+            "get_stock_data", "AAPL", "2026-01-01", "2026-01-15"
         )
     assert result == "YF"
-    akshare.assert_not_called()
+    finnhub.assert_not_called()
 
 
 def test_market_chain_never_falls_through_to_unlisted_vendor():
     set_config(
         {
-            "cn_data_vendors": ("akshare",),
-            "data_vendors": {"core_stock_apis": "default"},
+            "us_data_vendors": ("finnhub",),
+            "data_vendors": {"news_data": "default"},
             "tool_vendors": {},
         }
     )
-    tushare = mock.Mock(side_effect=AssertionError("outside configured market chain"))
+    yfinance = mock.Mock(side_effect=AssertionError("outside configured market chain"))
     with mock.patch.dict(
         interface.VENDOR_METHODS,
         {
-            "get_stock_data": {
-                "akshare": lambda *args: "",
-                "tushare": tushare,
+            "get_news": {
+                "finnhub": lambda *args: "",
+                "yfinance": yfinance,
             }
         },
         clear=False,
     ):
         result = interface.route_to_vendor(
-            "get_stock_data", "600519.SS", "2026-01-01", "2026-01-15"
+            "get_news", "AAPL", "2026-01-01", "2026-01-15"
         )
     assert "NO_DATA_AVAILABLE" in result
-    tushare.assert_not_called()
+    yfinance.assert_not_called()

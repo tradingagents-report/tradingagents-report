@@ -307,11 +307,6 @@ def test_structured_ohlcv_route_falls_back_after_invalid_tradingview_bar(monkeyp
         "AAPL",
     )
     yahoo = Mock(return_value=yahoo_result)
-    monkeypatch.setattr(
-        interface,
-        "get_vendor",
-        lambda category, method=None: "tradingview,yfinance",
-    )
     monkeypatch.setitem(
         interface.VENDOR_METHODS,
         "get_ohlcv",
