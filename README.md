@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://www.tradingagentsreport.com/icon-512.png" width="72" height="72" alt="TradingAgents Report">
+</p>
+
 # TradingAgents Report
 
 **TradingAgents Report** is a multi-agent equity-research framework. It splits a ticker into evidence gathering, bull/bear debate, a trade proposal, risk review, and a five-level portfolio-manager rating. The output is a research report and a structured decision card. It is **not** a broker integration and it does **not** place live orders.
