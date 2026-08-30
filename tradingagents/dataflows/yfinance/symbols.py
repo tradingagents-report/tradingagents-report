@@ -1,4 +1,4 @@
-"""Yahoo Finance 专用的标的符号规范化。
+"""Yahoo Finance-specific ticker normalization.
 
 Yahoo Finance (the default vendor) uses specific ticker conventions that
 differ from the broker / TradingView / MT5 style symbols users often type:

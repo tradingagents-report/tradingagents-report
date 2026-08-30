@@ -385,8 +385,8 @@ def render_trader_proposal(proposal: TraderProposal) -> str:
 
     The trailing transaction-proposal line is preserved for backward
     compatibility with older prompts and greps. Its wording follows
-    ``output_language`` (English ``TRANSACTION PROPOSAL`` or Chinese
-    ``交易执行建议``). It is the Trader's execution view — not the
+    ``output_language`` (English ``TRANSACTION PROPOSAL`` or the localized
+    trader-proposal label). It is the Trader's execution view — not the
     Portfolio Manager's final rating.
     """
     labels = report_labels()

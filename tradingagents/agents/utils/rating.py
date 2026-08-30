@@ -45,7 +45,7 @@ _FINAL_RATING_LABEL_PATTERN = "|".join(
     )
 )
 
-# Matches "Rating: X" / "评级：增持" / "권고: 매수" — tolerates markdown bold
+# Matches "Rating: X" / localized rating labels — tolerates markdown bold
 # wrappers and either a colon, fullwidth colon, or hyphen separator.
 _RATING_LABEL_RE = re.compile(
     rf"(?:{_RATING_LABEL_PATTERN}).*?[:：\-][\s*]*([^\s*]+)",
@@ -88,8 +88,8 @@ def normalize_markdown_header_cell(cell: str) -> str:
 def iter_markdown_header_tables(text: str):
     """Yield ``(headers, data_row)`` for columnar Markdown summary tables.
 
-    Requires a separator row so key-value tables such as
-    ``| 目标价 | 4.90 元 |`` are not misread as a header plus the next field.
+    Requires a separator row so key-value tables such as a price-target row
+    are not misread as a header plus the next field.
     """
     lines = str(text or "").splitlines()
     index = 0

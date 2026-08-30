@@ -1,4 +1,4 @@
-"""跨供应商复用的标的符号辅助函数。"""
+"""Ticker helpers shared across vendors."""
 
 from __future__ import annotations
 
@@ -9,10 +9,11 @@ _CRYPTO_QUOTES = ("USDT", "USDC", "USD")
 
 
 def crypto_base(raw: str) -> str | None:
-    """返回已知 USD、USDT 或 USDC 计价加密资产的基础币种。
+    """Return the base asset for known USD, USDT, or USDC crypto quotes.
 
-    该函数不转换供应商符号，只识别 ``BTC-USD``、``BTCUSD``、
-    ``BTC-USDT`` 等形式，供社交数据源和 Yahoo 规范化逻辑共用。
+    Does not convert vendor symbols. It only recognizes forms such as
+    ``BTC-USD``, ``BTCUSD``, and ``BTC-USDT`` for social feeds and Yahoo
+    normalization.
     """
     if not isinstance(raw, str):
         return None

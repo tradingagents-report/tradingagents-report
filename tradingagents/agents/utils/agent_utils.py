@@ -119,7 +119,7 @@ def get_transaction_proposal_instruction() -> str:
 
     Graph routing no longer greps for this phrase; it remains only so
     free-text analysts do not steal the Trader's chrome and confuse readers
-    who treat the first ``…建议`` they see as the portfolio decision.
+    who treat the first ``…recommendation`` they see as the portfolio decision.
     """
     from tradingagents.agents.utils.report_i18n import (
         get_transaction_proposal_phrase,
@@ -257,8 +257,8 @@ def merge_display_name_into_identity(
 ) -> dict[str, str]:
     """Prefer submit-time UI display name as the primary company label.
 
-    TradingView English ``description`` alone is a common source of Chinese-report
-    name hallucinations (e.g. JOVE → 杰美特). The UI already prefers
+    TradingView English ``description`` alone is a common source of
+    localized-report name hallucinations. The UI already prefers
     ``local_description``; when that name was captured at job submit, inject it
     as ground truth while retaining any alternate English name.
     """

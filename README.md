@@ -1,35 +1,35 @@
 # TradingAgents Report
 
-**TradingAgents Report** 是一套多智能体投研框架：把一只标的拆成证据收集、多空辩论、交易提案、风险审查，以及投资组合经理的五档评级。产物是研究报告和结构化决策卡，**不是**券商接入或真实下单。
+**TradingAgents Report** is a multi-agent equity-research framework. It splits a ticker into evidence gathering, bull/bear debate, a trade proposal, risk review, and a five-level portfolio-manager rating. The output is a research report and a structured decision card. It is **not** a broker integration and it does **not** place live orders.
 
-本仓库是可自托管的研究引擎。不想自己跑模型与数据源时，可以直接使用托管研究台：
+This repository is the self-hosted research engine. If you would rather not run models and data vendors yourself, use the hosted desk:
 
-- 官网：[tradingagentsreport.com](https://www.tradingagentsreport.com)
-- 研究台：[agent.tradingagentsreport.com](https://agent.tradingagentsreport.com)
+- Site: [tradingagentsreport.com](https://www.tradingagentsreport.com)
+- Desk: [agent.tradingagentsreport.com](https://agent.tradingagentsreport.com)
 
-本项目基于 [Tauric Research / TradingAgents](https://github.com/TauricResearch/TradingAgents)（Apache 2.0）增强，默认行情走 [TradingView Data API](https://www.tradingviewapi.com/)。
+This project is an Apache 2.0 derivative of [Tauric Research / TradingAgents](https://github.com/TauricResearch/TradingAgents). Market data defaults to [TradingView Data API](https://www.tradingviewapi.com/).
 
-> 仅供研究参考，不构成投资建议。TradingView Data API 为非官方第三方数据服务，与 TradingView, Inc. 无隶属关系。
+> For research only. Not investment advice. TradingView Data API is an unofficial third-party market-data service and is not affiliated with TradingView, Inc.
 
-## 相对上游的增强
+## What this adds on top of upstream
 
-| 能力 | 说明 |
+| Capability | Notes |
 |---|---|
-| TradingView Data API | 交易所级代码、日线、指标、基本面、新闻、日历、同行、多周期 TA |
-| 结构化决策 | 分析师分区信号、`decision_brief`、分析日边界内的价格/基本面图表快照 |
-| 多市场标的 | `600519.SS`、`HKEX:700`、`NASDAQ:AAPL` 确定性解析 |
-| A 股可选源 | AKShare / Tushare / BaoStock / PandaAI（`pip install ".[china-data]"`） |
-| 缓存 | 默认进程内 TTL；可选 Redis 跨进程复用，减少 API 调用 |
+| TradingView Data API | Exchange-level symbols, daily bars, indicators, fundamentals, news, calendars, peers, multi-timeframe TA |
+| Structured decisions | Analyst-section signals, `decision_brief`, in-window price/fundamental chart snapshots |
+| Multi-market tickers | Deterministic parsing for `600519.SS`, `HKEX:700`, `NASDAQ:AAPL` |
+| Optional China vendors | AKShare / Tushare / BaoStock / PandaAI (`pip install ".[china-data]"`) |
+| Cache | In-process TTL by default; optional Redis to reuse requests across processes |
 
-上游已有的多智能体辩论、多 LLM Provider、checkpoint、五档评级，这里继续保留。
+Upstream multi-agent debate, multi-LLM providers, checkpoints, and the five-level rating stay in place.
 
-## 快速开始
+## Quick start
 
-### 1. 申请行情 Key
+### 1. Get a market-data key
 
-打开 [https://www.tradingviewapi.com/](https://www.tradingviewapi.com/)，在 Console 领取 API Key。完整多市场能力需要该 Key；未配置时会回退到 Yahoo Finance 等已启用供应商。
+Open [https://www.tradingviewapi.com/](https://www.tradingviewapi.com/) and create a Console API key. Full multi-market coverage needs that key. Without it, the engine falls back to Yahoo Finance and other enabled vendors.
 
-### 2. 安装
+### 2. Install
 
 ```bash
 git clone https://github.com/tradingagents-report/tradingagents-report.git
@@ -39,39 +39,39 @@ source .venv/bin/activate
 pip install .
 ```
 
-可选：
+Optional extras:
 
 ```bash
-pip install ".[china-data]"   # A 股适配器
+pip install ".[china-data]"   # China-market adapters
 pip install ".[bedrock]"      # Amazon Bedrock
 ```
 
-### 3. 配置
+### 3. Configure
 
 ```bash
 cp .env.example .env
 ```
 
-最少填写：
+Minimum:
 
 ```bash
-OPENAI_API_KEY=...           # 或你选用的其他 LLM Provider
+OPENAI_API_KEY=...           # or another LLM provider
 TRADINGVIEW_API_KEY=...      # https://www.tradingviewapi.com/
 ```
 
-客户端使用 `Authorization: Bearer` 调用 `https://api.tradingviewapi.com`。旧的 `TRADINGVIEW_RAPIDAPI_KEY` 仍可作为 Console 凭据；只有设置 `TRADINGVIEW_BACKEND=rapid` 才会改走 RapidAPI 主机。
+The client calls `https://api.tradingviewapi.com` with `Authorization: Bearer`. Legacy `TRADINGVIEW_RAPIDAPI_KEY` still works as a Console credential. Set `TRADINGVIEW_BACKEND=rapid` only if you want the RapidAPI host.
 
-**不需要 Redis 或 PostgreSQL。** 行情缓存默认在进程内存中。多进程分析同一标的时，可设置 `REDIS_URL` 共享缓存、节省额度。
+**Redis and PostgreSQL are not required.** Market-data cache lives in process memory by default. Set `REDIS_URL` if several processes analyze the same ticker and you want to share cache / save quota.
 
-### 4. 运行 CLI
+### 4. Run the CLI
 
 ```bash
 tradingagents-report
-# 或
+# or
 tradingagents
 ```
 
-按提示选择标的、日期、模型和辩论轮次。
+Follow the prompts for ticker, date, models, and debate rounds.
 
 ### Python
 
@@ -89,16 +89,16 @@ _, decision = ta.propagate("NASDAQ:AAPL", "2026-08-01")
 print(decision)
 ```
 
-## 数据源
+## Data sources
 
-默认链优先 TradingView，然后 yfinance / Alpha Vantage。宏观用 FRED，预测市场用 Polymarket。
+The default chain prefers TradingView, then yfinance / Alpha Vantage. Macro data uses FRED. Prediction markets use Polymarket.
 
-A 股示例：`600519.SS`、`000001.SZ`。港股：`0700.HK`。未配置 TradingView Key 时，仍可走 Yahoo 兼容后缀。
+China A-share examples: `600519.SS`, `000001.SZ`. Hong Kong: `0700.HK`. Without a TradingView key, Yahoo-compatible suffixes still work.
 
-详见 [`tradingagents/dataflows/README.md`](tradingagents/dataflows/README.md) 与 [`docs/DATA_SOURCE_CONFIGURATION.md`](docs/DATA_SOURCE_CONFIGURATION.md)。
+See [`tradingagents/dataflows/README.md`](tradingagents/dataflows/README.md) and [`docs/DATA_SOURCE_CONFIGURATION.md`](docs/DATA_SOURCE_CONFIGURATION.md).
 
-## 许可
+## License
 
-Apache License 2.0。请保留上游 Tauric Research 的版权声明，见 `LICENSE` 与 `NOTICE`。
+Apache License 2.0. Keep the upstream Tauric Research copyright notices in `LICENSE` and `NOTICE`.
 
-本仓库不转授任何第三方行情或 LLM 供应商的数据权利。使用 TradingView Data API 须遵守其[服务条款](https://www.tradingviewapi.com/)。
+This repository does not sublicense third-party market-data or LLM vendor rights. Use of TradingView Data API is subject to its [terms of service](https://www.tradingviewapi.com/).

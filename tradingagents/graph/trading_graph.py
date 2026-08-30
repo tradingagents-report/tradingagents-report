@@ -386,7 +386,7 @@ class TradingAgentsGraph:
         graph regardless of entry point.
 
         When ``display_name`` is provided (job submit-time UI name), it becomes
-        the primary company label so localized names like ``中富电路`` win over
+        the primary company label so localized names win over
         English-only TradingView descriptions. Optional ``english_name`` keeps
         the common English label when it differs from the local name.
         """
