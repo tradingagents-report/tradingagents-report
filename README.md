@@ -32,8 +32,8 @@
 ### 2. 安装
 
 ```bash
-git clone https://github.com/hypier/trading-agents-report.git
-cd trading-agents-report
+git clone https://github.com/tradingagents-report/tradingagents-report.git
+cd tradingagents-report
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install .
