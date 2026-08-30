@@ -1,0 +1,108 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tradingagents-report"
+version = "0.3.1"
+description = "TradingAgents Report: multi-agent LLM equity research with TradingView Data API"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "langchain-core>=0.3.81",
+    "backtrader>=1.9.78.123",
+    "langchain-anthropic>=0.3.15",
+    "langchain-experimental>=0.3.4",
+    "langchain-google-genai>=4.0.0",
+    "langchain-openai>=0.3.23",
+    "langgraph>=0.4.8",
+    "langgraph-checkpoint-sqlite>=2.0.0",
+    "pandas>=2.3.0",
+    "parsel>=1.10.0",
+    "PySocks>=1.7.1",
+    "python-dotenv>=1.0.0",
+    "pytz>=2025.2",
+    "questionary>=2.1.0",
+    "redis>=6.2.0",
+    "requests>=2.32.4",
+    "rich>=14.0.0",
+    "socksio>=1.0.0",
+    "typer>=0.21.0",
+    "setuptools>=80.9.0",
+    "stockstats>=0.6.5",
+    "tqdm>=4.67.1",
+    "typing-extensions>=4.14.0",
+    "yfinance>=1.4.1",
+]
+
+[project.urls]
+Homepage = "https://www.tradingagentsreport.com"
+Hosted = "https://agent.tradingagentsreport.com"
+TradingViewAPI = "https://www.tradingviewapi.com/"
+Upstream = "https://github.com/TauricResearch/TradingAgents"
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.15",
+    "pytest>=8.0",
+    "pytest-subtests>=0.13",
+]
+bedrock = [
+    "langchain-aws>=1.5.0",
+]
+china-data = [
+    "akshare>=1.17.86",
+    "tushare>=1.4.21",
+    "baostock>=0.8.8",
+]
+pandaai = [
+    "panda_data>=0.0.1",
+]
+finnhub = [
+    "finnhub-python>=2.4.23",
+]
+market-data = [
+    "akshare>=1.17.86",
+    "tushare>=1.4.21",
+    "baostock>=0.8.8",
+    "panda_data>=0.0.1",
+    "finnhub-python>=2.4.23",
+]
+
+[project.scripts]
+tradingagents-report = "cli.main:app"
+tradingagents = "cli.main:app"
+
+[tool.setuptools.packages.find]
+include = ["tradingagents*", "cli*", "application*"]
+
+[tool.setuptools.package-data]
+cli = ["static/*"]
+tradingagents = ["dataflows/data/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "unit: fast isolated unit tests",
+    "integration: tests requiring external services",
+    "smoke: quick sanity-check tests",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["results", "worklog"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "C4", "SIM"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"**/__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
