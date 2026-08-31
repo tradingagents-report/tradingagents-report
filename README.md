@@ -92,6 +92,8 @@ _, decision = ta.propagate("NASDAQ:AAPL", "2026-08-01")
 print(decision)
 ```
 
+Completed CLI / programmatic runs are saved under `~/.tradingagents/runs/{run_id}/` (`complete_report.md`, `decision.json`, `manifest.json`, `state.json`). A SQLite catalog at `~/.tradingagents/runs.sqlite` lists them by ticker and date. Set `TRADINGAGENTS_RUN_STORE_ENABLED=false` to disable. The hosted product API does not use this store.
+
 ## Data sources
 
 The default chain prefers TradingView, then yfinance / Alpha Vantage. Macro data uses FRED. Prediction markets use Polymarket.
