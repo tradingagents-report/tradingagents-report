@@ -53,6 +53,13 @@ bedrock = [
 finnhub = [
     "finnhub-python>=2.4.23",
 ]
+mcp = [
+    "mcp>=1.8.0,<2",
+]
+api = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+]
 market-data = [
     "finnhub-python>=2.4.23",
 ]
@@ -60,9 +67,11 @@ market-data = [
 [project.scripts]
 tradingagents-report = "cli.main:app"
 tradingagents = "cli.main:app"
+tradingagents-mcp = "mcp_server.__main__:main"
+tradingagents-api = "local_api.__main__:main"
 
 [tool.setuptools.packages.find]
-include = ["tradingagents*", "cli*", "application*"]
+include = ["tradingagents*", "cli*", "application*", "mcp_server*", "local_api*"]
 
 [tool.setuptools.package-data]
 cli = ["static/*"]

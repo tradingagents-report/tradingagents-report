@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="https://www.tradingagentsreport.com/icon-512.png" width="72" height="72" alt="TradingAgents Report">
-</p>
-
 # TradingAgents Report
 
 **TradingAgents Report** is a multi-agent equity-research framework. It splits a ticker into evidence gathering, bull/bear debate, a trade proposal, risk review, and a five-level portfolio-manager rating. The output is a research report and a structured decision card. It is **not** a broker integration and it does **not** place live orders.
@@ -47,6 +43,8 @@ Optional extras:
 ```bash
 pip install ".[finnhub]"      # Finnhub
 pip install ".[bedrock]"      # Amazon Bedrock
+pip install ".[mcp]"          # local stdio MCP for Cursor / Claude
+pip install ".[api]"          # local HTTP API (uvicorn)
 ```
 
 ### 3. Configure
@@ -93,6 +91,41 @@ print(decision)
 ```
 
 Completed CLI / programmatic runs are saved under `~/.tradingagents/runs/{run_id}/` (`complete_report.md`, `decision.json`, `manifest.json`, `state.json`). A SQLite catalog at `~/.tradingagents/runs.sqlite` lists them by ticker and date. Set `TRADINGAGENTS_RUN_STORE_ENABLED=false` to disable. The hosted product API does not use this store.
+
+Self-hosting has three adapters over the same engine: CLI (`tradingagents`), stdio MCP (`tradingagents-mcp`), and a thin local HTTP API (`tradingagents-api`). None of them is the hosted desk at agent.tradingagentsreport.com. The MCP server and local HTTP API are maintained in this public repository (`mcp_server/`, `local_api/`); they are not copied from the private Core tree.
+
+## MCP
+
+The same research tools as the [hosted MCP](https://www.tradingagentsreport.com/en/mcp) (`start_analysis` → poll `get_analysis` → `get_analysis_report`, plus `get_quote` / `get_ohlcv` / `get_news` / `get_ta_summary` / `get_fundamentals`) run **locally over stdio**. There is no OAuth; the process uses your `.env` keys and writes runs to `~/.tradingagents/runs/`. Paper trading, credits, and watchlists stay on the hosted desk.
+
+```bash
+pip install ".[mcp]"
+```
+
+Cursor / Claude config (stdio):
+
+```json
+{
+  "mcpServers": {
+    "tradingagents-report": {
+      "command": "tradingagents-mcp"
+    }
+  }
+}
+```
+
+Or `python -m mcp_server`. Analysis is asynchronous: `start_analysis` returns an id immediately; poll `get_analysis` until `succeeded`. Daily bars only for `get_ohlcv` (`timeframe` `D`). Depth market data can still use [TradingView MCP](https://www.tradingviewapi.com/).
+
+## Local HTTP API
+
+A thin FastAPI process over the same local run store. No PostgreSQL, Redis, Clerk, or credits.
+
+```bash
+pip install ".[api]"
+tradingagents-api --host 127.0.0.1 --port 8000
+```
+
+Or `python -m local_api`. Health: `GET /health`. Research: `POST /api/v1/analyses` (202 + id), poll `GET /api/v1/analyses/{id}`, then `GET /api/v1/analyses/{id}/report`. Market: `GET /api/v1/quote`, `/ohlcv`, `/ta-summary`, `/news`, `/fundamentals`. Listing: `GET /api/v1/listings/resolve?ticker=AAPL`. Bind stays on localhost by default.
 
 ## Data sources
 

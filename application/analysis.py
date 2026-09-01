@@ -39,6 +39,8 @@ class AnalysisEvent:
 class AnalysisResult:
     final_state: dict[str, Any]
     decision: str
+    run_id: str | None = None
+    run_dir: str | None = None
 
 
 def run_analysis(
@@ -77,4 +79,10 @@ def run_analysis(
         display_name=command.display_name,
         english_name=command.english_name,
     )
-    return AnalysisResult(final_state=final_state, decision=str(decision))
+    last_run = getattr(graph, "last_run", None)
+    return AnalysisResult(
+        final_state=final_state,
+        decision=str(decision),
+        run_id=getattr(last_run, "run_id", None),
+        run_dir=str(last_run.directory) if last_run is not None else None,
+    )

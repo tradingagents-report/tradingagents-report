@@ -42,6 +42,7 @@ from tradingagents.dataflows.utils import safe_ticker_component
 from tradingagents.default_config import DEFAULT_CONFIG
 from tradingagents.llm_clients import create_llm_client
 from tradingagents.reporting import write_report_tree
+from tradingagents.run_store import persist_completed_run
 
 from .checkpointer import checkpoint_step, clear_checkpoint, get_checkpointer, thread_id
 from .conditional_logic import ConditionalLogic
@@ -176,6 +177,7 @@ class TradingAgentsGraph:
         self.curr_state = None
         self.ticker = None
         self.log_states_dict = {}  # date to full state dict
+        self.last_run = None
 
         # Graph-shape-affecting run choices, kept for the checkpoint signature.
         self.selected_analysts = tuple(selected_analysts)
@@ -536,7 +538,15 @@ class TradingAgentsGraph:
         self.curr_state = final_state
 
         # Log state to disk.
-        self._log_state(trade_date, final_state)
+        TradingAgentsGraph._log_state(self, trade_date, final_state)
+        self.last_run = persist_completed_run(
+            config=self.config,
+            ticker=company_name,
+            trade_date=str(trade_date),
+            final_state=final_state,
+            state_snapshot=self.log_states_dict[str(trade_date)],
+            analysts=TradingAgentsGraph._run_analysts(self),
+        )
 
         # Store decision for deferred reflection on the next same-ticker run.
         self.memory_log.store_decision(
@@ -660,6 +670,9 @@ class TradingAgentsGraph:
             "fundamentals_chart": final_state.get("fundamentals_chart"),
         }
 
+        if not self.config.get("run_store_enabled"):
+            return
+
         # Save to file. Reject ticker values that would escape the
         # results directory when joined as a path component.
         safe_ticker = safe_ticker_component(self.ticker)
@@ -669,6 +682,12 @@ class TradingAgentsGraph:
         log_path = directory / f"full_states_log_{trade_date}.json"
         with open(log_path, "w", encoding="utf-8") as f:
             json.dump(self.log_states_dict[str(trade_date)], f, indent=4)
+
+    def _run_analysts(self) -> tuple[str, ...]:
+        raw = getattr(self, "selected_analysts", ())
+        if isinstance(raw, (list, tuple)) and all(isinstance(item, str) for item in raw):
+            return tuple(raw)
+        return ()
 
     def process_signal(self, full_signal):
         """Process a signal to extract the core decision."""
